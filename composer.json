@@ -11,7 +11,9 @@
         "laravel/jetstream": "^5.3",
         "laravel/sanctum": "^4.1",
         "laravel/tinker": "^2.10.1",
-        "livewire/livewire": "^3.0"
+        "livewire/livewire": "^3.0",
+        "mongodb/laravel-mongodb": "^5.4",
+        "mongodb/mongodb": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

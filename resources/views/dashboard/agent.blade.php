@@ -19,17 +19,19 @@
         <div class="bg-white shadow-md rounded-lg p-8 mb-12 max-w-3xl mx-auto">
             <h2 class="text-3xl font-bold text-gray-700 mb-6">Your Profile</h2>
             <div class="flex items-center">
-                <img src="{{ asset('uploads/agents/' . ($agent['profile_image'] ?? 'default_agent.png')) }}" 
-                     alt="Profile Image" class="w-32 h-32 rounded-full mr-6 shadow-md">
-                <div>
-                    <p class="text-lg"><strong>Name:</strong> {{ $agent['name'] }}</p>
-                    <p class="text-lg"><strong>Email:</strong> {{ $agent['email'] }}</p>
-                    <p class="text-lg"><strong>Contact:</strong> {{ $agent['contact_number'] }}</p>
-                    <a href="{{ route('profile.edit') }}" 
-                       class="mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-800">
-                        Edit Profile
-                    </a>
-                </div>
+                @if ($agent)
+                    <img src="{{ asset('uploads/agents/' . ($agent['profile_image'] ?? 'default_agent.png')) }}" alt="Profile Image" class="w-32 h-32 rounded-full mr-6 shadow-md">
+                    <div>
+                        <p class="text-lg"><strong>Name:</strong> {{ $agent['name'] }}</p>
+                        <p class="text-lg"><strong>Email:</strong> {{ $agent['email'] }}</p>
+                        <p class="text-lg"><strong>Contact:</strong> {{ $agent['contact_number'] }}</p>
+                        <a href="{{ route('profile.edit') }}" class="mt-4 inline-block bg-green-600 text-white px-6 py-2 rounded shadow hover:bg-green-700">
+                            Edit Profile
+                        </a>
+                    </div>
+                @else
+                    <p class="text-red-500">Agent profile not found.</p>
+                @endif
             </div>
         </div>
 

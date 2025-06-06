@@ -165,4 +165,12 @@ class MongoPropertyService
 
         return $this->collection->find($query)->toArray();
     }
+
+    public function getApprovedProperties()
+    {
+        return $this->collection
+            ->find(['status' => 'approved'])
+            ->toArray();
+    }
+
 }

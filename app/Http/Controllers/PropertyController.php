@@ -29,7 +29,7 @@ class PropertyController extends Controller
      * Handle property submission.
      */
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -42,10 +42,10 @@ class PropertyController extends Controller
             'images.*' => 'nullable|image|max:2048',
         ]);
 
-        $user = Auth::user();
+        $user = $request->user(); // Correct for Sanctum token auth
 
         $imageFilenames = [];
-        if ($request->has('images') && $request->hasFile('images')) {
+        if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 if ($image->isValid()) {
                     $fileName = time() . '_' . $image->getClientOriginalName();
@@ -55,8 +55,8 @@ class PropertyController extends Controller
             }
         }
 
-        // ✅ Proper ID generation
-        $propertyId = time(); // or use Str::uuid()->toString();
+        $propertyId = time();
+
         $this->propertyService->createProperty([
             'property_id' => $propertyId,
             'title' => $validated['title'],
@@ -73,16 +73,15 @@ class PropertyController extends Controller
             'images' => $imageFilenames,
             'created_at' => now(),
         ]);
-        
-        $user = Auth::user();
-        $dashboardRoute = match ($user->role) {
-            'agent' => 'agent.dashboard',
-            'admin' => 'admin.dashboard',
-            default => 'client.dashboard',
-        };
 
-        return redirect()->route($dashboardRoute)->with('success', 'Property posted and awaiting admin approval.');
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Property posted successfully',
+                'property_id' => $propertyId
+            ], 201);
+        }
     }
+
     public function edit($id)
     {
         $property = $this->propertyService->getPropertyFlexible($id);

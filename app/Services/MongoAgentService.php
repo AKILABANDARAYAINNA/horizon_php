@@ -4,6 +4,8 @@ namespace App\Services;
 
 use MongoDB\Client;
 use MongoDB\BSON\Regex;
+use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\ObjectId;
 
 class MongoAgentService
 {
@@ -21,6 +23,11 @@ class MongoAgentService
      */
     public function insertAgent(array $data)
     {
+        // Ensure created_at timestamp is included
+        if (!isset($data['created_at'])) {
+            $data['created_at'] = new UTCDateTime(now());
+        }
+
         return $this->collection->insertOne($data);
     }
 
@@ -76,7 +83,7 @@ class MongoAgentService
     public function updateVerificationStatus($agentId, $status)
     {
         return $this->collection->updateOne(
-            ['_id' => new \MongoDB\BSON\ObjectId($agentId)],
+            ['_id' => new ObjectId($agentId)],
             ['$set' => ['verification_status' => $status]]
         );
     }
@@ -91,7 +98,7 @@ class MongoAgentService
 
     public function submitRating(string $agentId, int $rating)
     {
-        $agent = $this->collection->findOne(['_id' => new \MongoDB\BSON\ObjectId($agentId)]);
+        $agent = $this->collection->findOne(['_id' => new ObjectId($agentId)]);
 
         if (!$agent) return;
 
@@ -102,11 +109,25 @@ class MongoAgentService
         $newAverage = (($currentAverage * $totalRatings) + $rating) / $newTotalRatings;
 
         $this->collection->updateOne(
-            ['_id' => new \MongoDB\BSON\ObjectId($agentId)],
+            ['_id' => new ObjectId($agentId)],
             [
                 '$set' => ['average_rating' => round($newAverage, 1)],
                 '$inc' => ['total_ratings' => 1]
             ]
         );
     }
+
+    /**
+     * Find agent by email address (for duplication or auto-fill checks)
+     */
+    public function findAgentByEmail($email)
+    {
+        return $this->collection->findOne(['email' => $email]);
+    }
+
+    public function getApprovedAgents()
+    {
+        return $this->collection->find(['verification_status' => 'approved'])->toArray();
+    }
+
 }

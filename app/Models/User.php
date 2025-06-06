@@ -11,9 +11,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Authenticatable;
 
 class User extends Eloquent implements AuthenticatableContract
 {
+    use Authenticatable;
     use HasApiTokens;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -103,6 +105,7 @@ class User extends Eloquent implements AuthenticatableContract
         'email',
         'password',
         'role',
+        'api_token',
     ];
 
     /**

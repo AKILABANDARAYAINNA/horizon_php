@@ -27,7 +27,7 @@ class PropertyApiController extends Controller
             'area' => 'nullable|string',
             'property_type' => 'required|string',
             'for_sale_or_rent' => 'required|string|in:sale,rent',
-            'images.*' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:5120',
         ]);
 
         $user = $request->user(); // Authenticated via token
@@ -35,9 +35,8 @@ class PropertyApiController extends Controller
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $filename = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('uploads/properties'), $filename);
-                $imageFilenames[] = $filename;
+                $path = $image->store('uploads/properties');
+                $imageFilenames[] = basename($path); // Only need the stored filename
             }
         }
 
@@ -64,5 +63,21 @@ class PropertyApiController extends Controller
     {
         $properties = $this->propertyService->getApprovedProperties();
         return response()->json($properties);
+    }
+
+    public function search(Request $request)
+    {
+        $filters = [
+            'location' => $request->input('location'),
+            'price' => $request->input('price'),
+            'property_type' => $request->input('property_type'),
+            'for_sale_or_rent' => $request->input('for_sale_or_rent'),
+        ];
+
+        $properties = $this->propertyService->searchProperties($filters);
+
+        return response()->json([
+            'properties' => $properties
+        ], 200);
     }
 }

@@ -77,3 +77,6 @@ Route::post('/agent/register', [MobileAgentController::class, 'store']);
 Route::middleware('auth:api')->post('/property/store', [PropertyApiController::class, 'store']);
 
 Route::get('/properties', [PropertyApiController::class, 'index']);
+
+Route::post('/search', [PropertyApiController::class, 'search']);
+

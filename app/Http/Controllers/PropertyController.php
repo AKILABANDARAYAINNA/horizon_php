@@ -39,7 +39,7 @@ class PropertyController extends Controller
             'area' => 'nullable|string|max:255',
             'property_type' => 'required|string',
             'for_sale_or_rent' => 'required|string|in:sale,rent',
-            'images.*' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:5120',
         ]);
 
         $user = $request->user(); // Correct for Sanctum token auth
@@ -119,7 +119,7 @@ class PropertyController extends Controller
             'area' => 'nullable|string|max:255',
             'property_type' => 'required|string',
             'for_sale_or_rent' => 'required|string|in:sale,rent',
-            'images.*' => 'nullable|image|max:2048',
+            'images.*' => 'nullable|image|max:5120',
         ]);
 
         $imageFilenames = $property['images'] ?? [];

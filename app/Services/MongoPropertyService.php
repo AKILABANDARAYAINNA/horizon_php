@@ -137,12 +137,34 @@ class MongoPropertyService
         }
     }
 
-    public function searchProperties(array $query)
+    public function searchProperties(array $query): array
     {
-        $query['status'] = 'approved'; // Always only show approved
-        return $this->collection->find($query)->toArray();
-    }
+        $collection = $this->collection; // Use the property from __construct
 
+        $mongoQuery = [];
+
+        if (!empty($query['location'])) {
+            $mongoQuery['location'] = ['$regex' => $query['location'], '$options' => 'i'];
+        }
+
+        if (!empty($query['budget'])) {
+            $mongoQuery['price'] = ['$lte' => (int)$query['price']];
+        }
+
+        if (!empty($query['property_type'])) {
+            $mongoQuery['property_type'] = $query['property_type'];
+        }
+
+        if (!empty($query['for_sale_or_rent'])) {
+            $mongoQuery['for_sale_or_rent'] = $query['for_sale_or_rent'];
+        }
+
+        $mongoQuery['status'] = 'approved';
+
+        $cursor = $collection->find($mongoQuery);
+
+        return iterator_to_array($cursor);
+    }
     public function filterProperties(array $criteria)
     {
         $query = [];
@@ -165,7 +187,6 @@ class MongoPropertyService
 
         return $this->collection->find($query)->toArray();
     }
-
     public function getApprovedProperties()
     {
         return $this->collection

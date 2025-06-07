@@ -102,3 +102,4 @@ Route::view('/terms-of-service', 'terms-of-service')->name('terms');
 
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'submit'])->name('contact.submit');
+

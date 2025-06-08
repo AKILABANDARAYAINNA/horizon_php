@@ -49,11 +49,12 @@ class PropertyController extends Controller
             foreach ($request->file('images') as $image) {
                 if ($image->isValid()) {
                     $fileName = time() . '_' . $image->getClientOriginalName();
-                    $image->move(public_path('uploads/properties'), $fileName);
-                    $imageFilenames[] = $fileName;
+                    $path = $image->storeAs('public/uploads/properties', $fileName);
+                    $imageFilenames[] = 'storage/uploads/properties/' . $fileName;
                 }
             }
         }
+
 
         $propertyId = time();
 
@@ -125,22 +126,25 @@ class PropertyController extends Controller
         $imageFilenames = $property['images'] ?? [];
 
         if ($request->hasFile('images')) {
-            // Optional: delete old files
-            foreach ($imageFilenames as $img) {
-                $path = public_path('uploads/properties/' . $img);
-                if (File::exists($path)) {
-                    File::delete($path);
-                }
+        // Delete old files
+        foreach ($imageFilenames as $img) {
+            $path = public_path($img); // Must delete from `public_path($img)` since you saved as 'storage/uploads/...'
+            if (File::exists($path)) {
+                File::delete($path);
             }
+        }
 
-            $imageFilenames = [];
-            foreach ($request->file('images') as $image) {
-                if ($image && $image->isValid()) {
-                    $fileName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('uploads/properties'), $fileName);
-                    $imageFilenames[] = $fileName;
-                }
+        // Upload new files
+        $imageFilenames = [];
+        foreach ($request->file('images') as $image) {
+            if ($image->isValid()) {
+                $fileName = time() . '_' . $image->getClientOriginalName();
+                $image->storeAs('public/uploads/properties', $fileName);
+                $imageFilenames[] = 'storage/uploads/properties/' . $fileName;
             }
+        }
+    
+
         }
 
         $this->propertyService->updateProperty($id, [

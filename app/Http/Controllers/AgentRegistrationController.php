@@ -58,7 +58,7 @@ class AgentRegistrationController extends Controller
                 'email' => $request->email,
                 'contact_number' => $request->contact_number,
                 'business_area' => $request->business_area,
-                'profile_image' => $imageName,
+                'profile_image' => url('uploads/agents/' . $imageName),
                 'payment_status' => 'paid',
                 'verification_status' => 'pending',
             ]);
